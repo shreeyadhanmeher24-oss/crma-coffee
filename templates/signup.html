@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Signup - CRMA</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="cart-page">
+
+  <nav class="navbar">
+    <div class="logo">CRMA ☕</div>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/login">Login</a></li>
+    </ul>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-wrapper" id="flash-box">
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <section class="cart-section">
+    <div class="auth-box">
+      <h2>Create Account</h2>
+      <form method="POST">
+        <input type="text" name="username" placeholder="Choose Username" required />
+        <input type="password" name="password" placeholder="Choose Password" required />
+        <button type="submit">Signup</button>
+      </form>
+      <p>Already have an account? <a href="/login">Login</a></p>
+    </div>
+  </section>
+
+  <script>
+    const flashBox = document.getElementById("flash-box");
+    if (flashBox) {
+      setTimeout(() => {
+        flashBox.style.opacity = "0";
+        flashBox.style.transform = "translateX(-50%) translateY(-10px)";
+        setTimeout(() => {
+          flashBox.style.display = "none";
+        }, 500);
+      }, 2500);
+    }
+  </script>
+
+</body>
+</html>

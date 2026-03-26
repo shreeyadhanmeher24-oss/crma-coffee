@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Orders - CRMA</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="cart-page">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">CRMA ☕</div>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/cart">Cart 🛒</a></li>
+      <li class="user-greet">Hi, {{ session['user'] }}</li>
+      <li><a href="/logout">Logout</a></li>
+    </ul>
+  </nav>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-wrapper" id="flash-box">
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <section class="cart-section">
+    <h1>My Orders</h1>
+
+    {% if orders %}
+      {% for order in orders %}
+        <div class="cart-item order-card">
+          <h3>Order #{{ order[0] }}</h3>
+
+          <div class="order-items">
+            {% for item in order[2].split('|') %}
+              <p>{{ item }}</p>
+            {% endfor %}
+          </div>
+
+          <p><strong>Total:</strong> {{ order[3] }}</p>
+          <p><strong>Payment:</strong> {{ order[5] }}</p>
+          <p><strong>Address:</strong> {{ order[4] }}</p>
+
+          <p class="delivery-status-text">
+            <strong>Delivery Status:</strong>
+            <span class="status-badge">{{ order[6] }}</span>
+          </p>
+
+          <!-- DELIVERY TRACKER -->
+          <div class="delivery-tracker">
+
+            <div class="tracker-step {% if order[6] in ['Order Placed', 'Packed', 'Out for Delivery', 'Delivered'] %}active{% endif %}">
+              <div class="tracker-circle">1</div>
+              <p>Order Placed</p>
+            </div>
+
+            <div class="tracker-line {% if order[6] in ['Packed', 'Out for Delivery', 'Delivered'] %}active-line{% endif %}"></div>
+
+            <div class="tracker-step {% if order[6] in ['Packed', 'Out for Delivery', 'Delivered'] %}active{% endif %}">
+              <div class="tracker-circle">2</div>
+              <p>Packed</p>
+            </div>
+
+            <div class="tracker-line {% if order[6] in ['Out for Delivery', 'Delivered'] %}active-line{% endif %}"></div>
+
+            <div class="tracker-step {% if order[6] in ['Out for Delivery', 'Delivered'] %}active{% endif %}">
+              <div class="tracker-circle">3</div>
+              <p>Out for Delivery</p>
+            </div>
+
+            <div class="tracker-line {% if order[6] in ['Delivered'] %}active-line{% endif %}"></div>
+
+            <div class="tracker-step {% if order[6] == 'Delivered' %}active{% endif %}">
+              <div class="tracker-circle">4</div>
+              <p>Delivered</p>
+            </div>
+
+          </div>
+
+          <!-- UPDATE BUTTON -->
+          {% if order[6] != 'Delivered' %}
+            <div style="margin-top: 22px;">
+              <a href="/update-order-status/{{ order[0] }}" class="checkout-btn">
+                Update Delivery Status
+              </a>
+            </div>
+          {% else %}
+            <div style="margin-top: 22px;">
+              <button class="checkout-btn" style="background: #4CAF50; cursor: default;">
+                Delivered Successfully
+              </button>
+            </div>
+          {% endif %}
+
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="empty-cart">No orders placed yet.</p>
+    {% endif %}
+  </section>
+
+  <script>
+    const flashBox = document.getElementById("flash-box");
+    if (flashBox) {
+      setTimeout(() => {
+        flashBox.style.opacity = "0";
+        flashBox.style.transform = "translateX(-50%) translateY(-10px)";
+        setTimeout(() => {
+          flashBox.style.display = "none";
+        }, 500);
+      }, 2500);
+    }
+  </script>
+
+</body>
+</html>

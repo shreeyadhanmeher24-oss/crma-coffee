@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cart - CRMA</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="cart-page">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">CRMA ☕</div>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/orders">My Orders</a></li>
+      <li class="cart-link">Cart 🛒 <span id="cart-count">{{ cart_items | sum(attribute=4) if cart_items else 0 }}</span></li>
+      <li class="user-greet">Hi, {{ session['user'] }}</li>
+      <li><a href="/logout">Logout</a></li>
+    </ul>
+  </nav>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-wrapper" id="flash-box">
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <section class="cart-section">
+    <h1>Your Cart</h1>
+
+    {% if cart_items %}
+      {% for item in cart_items %}
+        <div class="cart-item">
+          <div>
+            <h3>{{ item[1] }}</h3>
+            <p>{{ item[2] }}</p>
+            <p>Quantity: {{ item[4] }}</p>
+          </div>
+
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="/update-cart/{{ item[0] }}/increase">
+              <button class="hero-btn" style="padding:10px 16px;">+</button>
+            </a>
+
+            <a href="/update-cart/{{ item[0] }}/decrease">
+              <button class="hero-btn" style="padding:10px 16px;">-</button>
+            </a>
+
+            <a href="/remove-from-cart/{{ item[0] }}">
+              <button class="hero-btn" style="padding:10px 16px; background:#ff6b6b; color:white;">Remove</button>
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+
+      <h2 style="margin-top: 30px; text-align:center;">Total: ₹{{ total }}</h2>
+
+      <a href="/checkout">
+        <button class="checkout-btn">Proceed to Checkout</button>
+      </a>
+
+    {% else %}
+      <p class="empty-cart">Your cart is empty.</p>
+    {% endif %}
+  </section>
+
+  <script>
+    const flashBox = document.getElementById("flash-box");
+    if (flashBox) {
+      setTimeout(() => {
+        flashBox.style.opacity = "0";
+        flashBox.style.transform = "translateX(-50%) translateY(-10px)";
+        setTimeout(() => {
+          flashBox.style.display = "none";
+        }, 500);
+      }, 2500);
+    }
+  </script>
+
+</body>
+</html>
