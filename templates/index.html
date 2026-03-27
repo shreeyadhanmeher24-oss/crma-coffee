@@ -2,11 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>CRMA Coffee</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
+
 <body>
+
+  <!-- ✅ LOGIN STATE (VERY IMPORTANT) -->
+  <script>
+    const isLoggedIn = {{ 'true' if session.get('user') else 'false' }};
+  </script>
 
   <!-- Navbar -->
   <nav class="navbar">
@@ -18,22 +24,24 @@
       <li><a href="#about">About</a></li>
       <li><a href="#reviews">Reviews</a></li>
 
-      <!-- Search Bar -->
+      <!-- Search -->
       <li>
         <input type="text" id="search-input" placeholder="Search coffee..." class="search-bar">
       </li>
 
       <!-- Cart -->
       <li id="cart-btn" class="cart-link">
-        Cart 🛒 <span id="cart-count">0</span>
+        Cart 🛒 <span id="cart-count">{{ cart_count }}</span>
       </li>
 
+      <!-- ✅ FIXED AUTH SECTION -->
       {% if session.get('user') %}
         <li><a href="/orders">My Orders</a></li>
         <li class="user-greet">Hi, {{ session['user'] }}</li>
         <li><a href="/logout">Logout</a></li>
       {% else %}
         <li><a href="/login">Login</a></li>
+        <li><a href="/signup">Signup</a></li>
       {% endif %}
     </ul>
   </nav>
@@ -49,7 +57,7 @@
     {% endif %}
   {% endwith %}
 
-  <!-- Hero Section -->
+  <!-- Hero -->
   <section class="hero" id="home">
     <video autoplay muted loop playsinline class="bg-video">
       <source src="{{ url_for('static', filename='assets/coffee.mp4') }}" type="video/mp4">
@@ -66,69 +74,63 @@
 
   <!-- Products -->
   <section class="products" id="products">
-  <h2>Our Coffee Collection</h2>
+    <h2>Our Coffee Collection</h2>
 
-  <div class="product-container">
-    {% for product in products %}
-    <div class="product" 
-         data-id="{{ product[0] }}"
-         data-name="{{ product[1] }}"
-         data-price="{{ product[2] }}"
-         data-image="{{ url_for('static', filename=product[3]) }}"
-         data-description="{{ product[4] }}"
-         data-name-search="{{ product[1] | lower }}">
+    <div class="product-container">
+      {% for product in products %}
+      <div class="product" 
+           data-id="{{ product[0] }}"
+           data-name="{{ product[1] }}"
+           data-price="{{ product[2] }}"
+           data-image="{{ url_for('static', filename=product[3]) }}"
+           data-description="{{ product[4] }}"
+           data-name-search="{{ product[1] | lower }}">
 
-      {% if loop.index == 1 or loop.index == 4 %}
-        <span class="best-seller">Best Seller</span>
-      {% endif %}
+        {% if loop.index == 1 or loop.index == 4 %}
+          <span class="best-seller">Best Seller</span>
+        {% endif %}
 
-      <img src="{{ url_for('static', filename=product[3]) }}" alt="{{ product[1] }}">
-      <h3>{{ product[1] }}</h3>
-      <p>{{ product[2] }}</p>
+        <img src="{{ url_for('static', filename=product[3]) }}">
+        <h3>{{ product[1] }}</h3>
+        <p>{{ product[2] }}</p>
 
-      <div class="product-btns">
-        <button class="quick-view-btn">Quick View</button>
-        <button class="add-cart-btn" data-product-id="{{ product[0] }}">Add to Cart</button>
+        <div class="product-btns">
+          <button class="quick-view-btn">Quick View</button>
+          <button class="add-cart-btn" data-product-id="{{ product[0] }}">Add to Cart</button>
+        </div>
       </div>
+      {% endfor %}
     </div>
-    {% endfor %}
-  </div>
-</section>
- 
+  </section>
 
-  <!-- About Section -->
+  <!-- About -->
   <section class="about-section" id="about">
     <div class="about-box">
       <h2>About CRMA</h2>
       <p>
         At CRMA, coffee is more than just a drink — it’s an experience.
-        We bring together rich flavors, premium beans, and crafted blends
-        to make every sip unforgettable.
-      </p>
-      <p>
-        Whether you love strong espresso, smooth latte, or refreshing cold brew,
-        CRMA is your cozy destination for premium coffee moments.
+        We bring together rich flavors and crafted blends.
       </p>
     </div>
   </section>
 
-  <!-- Reviews Section -->
+  <!-- Reviews -->
   <section class="reviews-section" id="reviews">
     <h2>What Our Customers Say</h2>
 
     <div class="review-container">
       <div class="review-card">
-        <p>"Absolutely loved the Cold Brew. Super refreshing and premium taste!"</p>
+        <p>"Absolutely loved the Cold Brew."</p>
         <h4>- Aanya</h4>
       </div>
 
       <div class="review-card">
-        <p>"The Cappuccino feels café-quality. CRMA’s vibe is honestly amazing."</p>
+        <p>"Cappuccino feels café-quality."</p>
         <h4>- Adi</h4>
       </div>
 
       <div class="review-card">
-        <p>"Best coffee website project I’ve seen — and the coffee looks delicious too."</p>
+        <p>"Amazing project and design."</p>
         <h4>- Shree</h4>
       </div>
     </div>
@@ -138,56 +140,42 @@
   <footer class="footer">
     <h3>CRMA ☕</h3>
     <p>Crafted Coffee. Elevated Taste.</p>
-    <p>Email: support@crma.com | Phone: +91 98765 43210</p>
-    <p>© 2026 CRMA Coffee. All rights reserved.</p>
   </footer>
 
-  <!-- PRODUCT POPUP MODAL -->
-<div class="product-modal" id="productModal">
-  <div class="product-modal-content">
-    <span class="close-modal" id="closeModal">&times;</span>
+  <!-- Modal -->
+  <div class="product-modal" id="productModal">
+    <div class="product-modal-content">
+      <span class="close-modal" id="closeModal">&times;</span>
 
-    <div class="modal-left">
-      <img id="modalImage" src="" alt="Coffee Product">
-    </div>
+      <div class="modal-left">
+        <img id="modalImage" src="">
+      </div>
 
-    <div class="modal-right">
-      <h2 id="modalName"></h2>
-      <p class="modal-price" id="modalPrice"></p>
-      <p class="modal-description" id="modalDescription"></p>
+      <div class="modal-right">
+        <h2 id="modalName"></h2>
+        <p id="modalPrice"></p>
+        <p id="modalDescription"></p>
 
-      <button id="modalAddToCart" class="hero-btn">Add to Cart</button>
+        <button id="modalAddToCart" class="hero-btn">Add to Cart</button>
+      </div>
     </div>
   </div>
-</div>
 
-  <!-- Login status for JS -->
-  <script>
-    const isLoggedIn = {{ 'true' if session.get('user') else 'false' }};
-  </script>
+  <!-- Toast -->
+  <div class="toast-box" id="toastBox">
+    <h4 id="toastTitle"></h4>
+    <p id="toastMessage"></p>
+  </div>
 
-  <!-- Main JS -->
+  <!-- JS -->
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 
-  <!-- TOAST NOTIFICATION -->
-<div class="toast-box" id="toastBox">
-  <div class="toast-icon">☕</div>
-  <div class="toast-text">
-    <h4 id="toastTitle">Added to cart</h4>
-    <p id="toastMessage">Your item was added successfully.</p>
-  </div>
-</div>
-
-  <!-- Auto-hide flash message -->
+  <!-- Flash auto-hide -->
   <script>
     const flashBox = document.getElementById("flash-box");
     if (flashBox) {
       setTimeout(() => {
-        flashBox.style.opacity = "0";
-        flashBox.style.transform = "translateX(-50%) translateY(-10px)";
-        setTimeout(() => {
-          flashBox.style.display = "none";
-        }, 500);
+        flashBox.style.display = "none";
       }, 2500);
     }
   </script>

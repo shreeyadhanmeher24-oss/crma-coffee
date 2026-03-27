@@ -6,17 +6,40 @@
   <title>Cart - CRMA</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
+
 <body class="cart-page">
+
+  <!-- ✅ LOGIN STATE FIX (IMPORTANT) -->
+  <script>
+    const isLoggedIn = {{ 'true' if session.get('user') else 'false' }};
+  </script>
 
   <!-- Navbar -->
   <nav class="navbar">
     <div class="logo">CRMA ☕</div>
+
     <ul class="nav-links">
       <li><a href="/">Home</a></li>
-      <li><a href="/orders">My Orders</a></li>
-      <li class="cart-link">Cart 🛒 <span id="cart-count">{{ cart_items | sum(attribute=4) if cart_items else 0 }}</span></li>
-      <li class="user-greet">Hi, {{ session['user'] }}</li>
-      <li><a href="/logout">Logout</a></li>
+
+      <!-- ✅ Only show if logged in -->
+      {% if session.get('user') %}
+        <li><a href="/orders">My Orders</a></li>
+
+        <li class="cart-link">
+          Cart 🛒 
+          <span id="cart-count">
+            {{ cart_items | sum(attribute=4) if cart_items else 0 }}
+          </span>
+        </li>
+
+        <li class="user-greet">Hi, {{ session['user'] }}</li>
+        <li><a href="/logout">Logout</a></li>
+
+      {% else %}
+        <!-- ✅ Proper login/signup links -->
+        <li><a href="/login">Login</a></li>
+        <li><a href="/signup">Signup</a></li>
+      {% endif %}
     </ul>
   </nav>
 
@@ -31,35 +54,38 @@
     {% endif %}
   {% endwith %}
 
+  <!-- CART SECTION -->
   <section class="cart-section">
     <h1>Your Cart</h1>
 
     {% if cart_items %}
       {% for item in cart_items %}
         <div class="cart-item">
+
           <div>
             <h3>{{ item[1] }}</h3>
             <p>{{ item[2] }}</p>
             <p>Quantity: {{ item[4] }}</p>
           </div>
 
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <div class="cart-actions">
             <a href="/update-cart/{{ item[0] }}/increase">
-              <button class="hero-btn" style="padding:10px 16px;">+</button>
+              <button class="hero-btn">+</button>
             </a>
 
             <a href="/update-cart/{{ item[0] }}/decrease">
-              <button class="hero-btn" style="padding:10px 16px;">-</button>
+              <button class="hero-btn">-</button>
             </a>
 
             <a href="/remove-from-cart/{{ item[0] }}">
-              <button class="hero-btn" style="padding:10px 16px; background:#ff6b6b; color:white;">Remove</button>
+              <button class="hero-btn remove-btn">Remove</button>
             </a>
           </div>
+
         </div>
       {% endfor %}
 
-      <h2 style="margin-top: 30px; text-align:center;">Total: ₹{{ total }}</h2>
+      <h2 class="cart-total">Total: ₹{{ total }}</h2>
 
       <a href="/checkout">
         <button class="checkout-btn">Proceed to Checkout</button>
@@ -70,6 +96,7 @@
     {% endif %}
   </section>
 
+  <!-- Flash auto-hide -->
   <script>
     const flashBox = document.getElementById("flash-box");
     if (flashBox) {

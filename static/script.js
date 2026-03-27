@@ -6,6 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const addCartButtons = document.querySelectorAll(".add-cart-btn");
   const quickViewButtons = document.querySelectorAll(".quick-view-btn");
 
+  // ✅ SAFE LOGIN CHECK (FIXED)
+  const loggedIn = (typeof isLoggedIn !== "undefined" && isLoggedIn === true);
+
   // MODAL ELEMENTS
   const productModal = document.getElementById("productModal");
   const closeModal = document.getElementById("closeModal");
@@ -42,11 +45,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ----------------------------
-  // CART NAV CLICK
+  // CART NAV CLICK (FIXED)
   // ----------------------------
   if (cartBtn) {
     cartBtn.addEventListener("click", () => {
-      if (isLoggedIn) {
+      if (loggedIn) {
         window.location.href = "/cart";
       } else {
         showToast("Login Required", "Please login first to view your cart.");
@@ -58,10 +61,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ----------------------------
-  // ADD TO CART FUNCTION
+  // ADD TO CART FUNCTION (FIXED)
   // ----------------------------
   function addToCart(productId, productName = "Item") {
-    if (!isLoggedIn) {
+    if (!loggedIn) {
       showToast("Login Required", "Please login first to add items to cart.");
       setTimeout(() => {
         window.location.href = "/login";
@@ -153,7 +156,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Close on outside click
   if (productModal) {
     productModal.addEventListener("click", (e) => {
       if (e.target === productModal) {
